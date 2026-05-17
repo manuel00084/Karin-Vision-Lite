@@ -2,7 +2,7 @@
 
 # Karin Vision Lite
 
-<img src="logo.png" width="700"/>
+<img src="https://i.postimg.cc/qqMdd9CB/a06021ee-a344-4c5e-8111-e89649c83c2c.png" width="700"/>
 
 ### Framework Ligero de Visión Artificial para Videojuegos, OCR y Aplicaciones VTuber
 
