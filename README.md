@@ -1,401 +1,164 @@
-# KARIN VISION LITE
-
 <div align="center">
 
-Motor de Visión Ligero, OCR Multilenguaje y Análisis Visual en Tiempo Real.
+# Karin Vision Lite
 
+<img src="logo.png" width="700"/>
+
+### Framework Ligero de Visión Artificial para Videojuegos, OCR y Aplicaciones VTuber
+
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)]()
+[![OpenCV](https://img.shields.io/badge/OpenCV-AI-green)]()
+[![Licencia](https://img.shields.io/badge/Licencia-MIT-yellow.svg)]()
+[![Estado](https://img.shields.io/badge/Estado-En%20Desarrollo-orange)]()
+
+</div>
+
+---
+
+# ✨ Descripción
+
+Karin Vision Lite es un framework ligero de visión artificial enfocado en:
+
+- 🎮 Videojuegos
+- 🖥️ OCR en tiempo real
+- 🤖 Sistemas VTuber con IA
+- 🌏 Reconocimiento multilenguaje
+- ⚡ Bajo consumo de recursos
+- 🧠 Detección visual inteligente
+
+Diseñado para gamers, desarrolladores y asistentes con IA.
+
+---
+
+# 🚀 Características
+
+## 🔍 Detección Visual Ligera
+Pipeline optimizado para bajo consumo de CPU y GPU.
+
+## 🌏 OCR Multilenguaje
+Compatible con:
+- Español
+- Inglés
+- Japonés
+- Coreano
+- Chino
+
+## 🎮 Detección Orientada a Videojuegos
+Especializado en:
+- HUD
+- subtítulos
+- menús
+- cajas de diálogo
+- elementos UI
+
+## ⚡ Procesamiento en Tiempo Real
 Diseñado para:
+- streaming
+- VTubers
+- asistentes IA
+- herramientas gamer
 
-* Sistemas VTuber IA
-* Compañeras IA para streams
-* OCR y visión artificial en tiempo real
-* Visión artificial ligera
-* Detección de eventos en tiempo real
-* Ejecución local offline
-
-</div>
-
----
-
-# Descripción General
-
-Karin Vision Lite es un motor de visión modular y ligero enfocado en percepción visual para videojuegos.
-
-A diferencia de OCR tradicionales y sistemas multimodales pesados, Karin Vision Lite está especializado en:
-
-* Interfaces visuales
-* Subtítulos
-* Detección de objetos
-* Análisis de escenas
-* Menús e interfaces
-* Procesamiento visual en tiempo real
-* Integración con VTubers IA
-
-El proyecto está diseñado para ejecutarse localmente con bajo consumo de CPU y mínima latencia.
+## 🤖 Integración con VTubers
+Compatible con aplicaciones como:
+- VTube Studio
+- VMagicMirror
+- asistentes virtuales
+- avatares interactivos
 
 ---
 
-# Características Principales
+# 🧠 Tecnologías Utilizadas
 
-## Arquitectura Ligera
-
-Optimizado para:
-
-* Streams largos
-* Bajo consumo de CPU
-* Ejecución estable
-* Análisis en tiempo real
+- OpenCV
+- OCR Engine
+- ONNX Runtime
+- Template Matching
+- ORB / AKAZE
+- Modelos ligeros de detección
 
 ---
 
-## OCR Multilenguaje
+# 🎯 Objetivos del Proyecto
 
-Motor OCR especializado para:
+Karin Vision Lite busca crear:
 
-* Español
-* Inglés
-* Japonés
-* Chino
-* Coreano
-
-Enfocado en:
-
-* Texto HUD
-* subtítulos
-* menús
-* cajas de diálogo
-* fuentes pixeladas
-* fuentes estilo anime
+- Visión artificial ligera
+- OCR optimizado para videojuegos
+- Comprensión visual en tiempo real
+- Integración con asistentes IA
+- Sistemas eficientes para PCs de bajos recursos
 
 ---
 
-## Sistema de Eventos en Tiempo Real
+# 📸 Ejemplos
 
-Detecta eventos del gameplay como:
+## OCR en Tiempo Real
+<img src="images/ocr_example.png"/>
 
-* enemigo detectado
-* boss detectado
-* vida baja
-* menú abierto
-* daño recibido
-* diálogo iniciado
+## Reconocimiento de HUD
+<img src="images/hud_detection.png"/>
 
-Perfecto para reacciones VTuber IA y automatización.
+## Procesamiento en Vivo
+<img src="images/realtime_demo.gif"/>
 
 ---
 
-## Núcleo Modular de Visión
+# ⚙️ Instalación
 
-Los módulos pueden funcionar independientemente.
-
-```text
-Motor de Captura
-      ↓
-Vision Core
-├── OCR Engine
-├── Detector de Enemigos
-├── Detector HUD
-├── Analizador de Escena
-├── Detector de Movimiento
-└── Sistema de Eventos
-      ↓
-IA / VTuber / TTS
+```bash
+git clone https://github.com/manuel00084/Karin-Vision-Lite
+cd Karin-Vision-Lite
+pip install -r requirements.txt
 ```
 
 ---
 
-# Objetivos
+# ▶️ Uso
 
-Karin Vision Lite busca proporcionar:
-
-* Visión ligera para videojuegos
-* OCR especializado gaming
-* Procesamiento offline
-* Sistemas IA modulares
-* Soporte para streaming de baja latencia
-* Integración VTuber IA
-
----
-
-# ¿Por Qué Karin Vision Lite?
-
-La mayoría de sistemas OCR y visión están diseñados para:
-
-* documentos
-* fotografías
-* entornos reales
-
-Los videojuegos son completamente diferentes.
-
-Los juegos contienen:
-
-* interfaces dinámicas
-* efectos visuales
-* outlines
-* motion blur
-* pixel fonts
-* anime fonts
-* subtítulos
-* interfaces transparentes
-
-Karin Vision Lite está diseñado para escenarios donde se requiere procesamiento visual eficiente, reconocimiento de texto multilenguaje y análisis visual en tiempo real con bajo consumo de recursos.
-
----
-
-# Funciones Planeadas
-
-## Visión
-
-* detección HUD
-* detección de objetos
-* tracking de enemigos
-* reconocimiento de bosses
-* clasificación de escenas
-* análisis de movimiento
-
----
-
-## OCR
-
-* OCR multilenguaje
-* lectura de subtítulos
-* soporte pixel fonts
-* soporte texto baja resolución
-* preprocess de texto
-* adaptive thresholding
-
----
-
-## Integración VTuber
-
-* triggers para comentarios IA
-* reacciones emocionales
-* memoria contextual
-* respuestas basadas en eventos
-* automatización de streams
-
----
-
-# Arquitectura
-
-```text
-Captura del Juego
-      ↓
-Preprocesamiento OpenCV
-      ↓
-OCR + Detección
-      ↓
-Sistema de Eventos
-      ↓
-Cerebro IA
-      ↓
-TTS / VTuber
+```bash
+python main.py
 ```
 
 ---
 
-# Filosofía de Rendimiento
+# 🛣️ Hoja de Ruta
 
-Karin Vision Lite prioriza:
-
-* eficiencia
-* modularidad
-* bajo consumo
-* estabilidad a largo plazo
-* escalabilidad
-
-El proyecto evita modelos IA innecesariamente grandes siempre que sea posible.
+- [ ] OCR avanzado optimizado para videojuegos
+- [ ] Comprensión de escenas con IA
+- [ ] Perfiles personalizados por juego
+- [ ] Traducción en tiempo real
+- [ ] Reacciones VTuber automáticas
+- [ ] Memoria visual inteligente
+- [ ] Optimización para anime y videojuegos
 
 ---
 
-# Plataformas Compatibles
+# 🌸 Ecosistema Karin
 
-## Sistemas Operativos
+Proyectos relacionados:
 
-* Windows
-* Linux
-* macOS
-
----
-
-# Tecnologías Planeadas
-
-## Core
-
-* Python
-* OpenCV
-* NumPy
-
-## IA
-
-* PyTorch
-* ONNX Runtime
-
-## OCR
-
-* Modelos OCR ligeros personalizados
-* Reconocimiento basado en caracteres
+- Karin Vision Lite
+- Karin VTuber IA
+- Karin Monogatari Studio
 
 ---
 
-# Ejemplos de Uso
+# ❤️ Filosofía
 
-## VTuber IA
+Karin Vision Lite se enfoca en:
 
-```text
-Boss detectado
-↓
-Evento generado
-↓
-Comentario IA
-↓
-Voz TTS
-↓
-Reacción VTuber
-```
+> Crear sistemas de visión artificial ligeros, rápidos y prácticos para gamers y creadores.
 
 ---
 
-## Lector de Subtítulos
+# 📜 Licencia
 
-```text
-Subtítulo del juego
-↓
-OCR Engine
-↓
-Traducción
-↓
-Salida de voz
-```
-
----
-
-## Asistente para Streams
-
-```text
-Vida baja detectada
-↓
-Evento de alerta
-↓
-Respuesta automática IA
-```
-
----
-
-# Estado del Proyecto
-
-Estado Actual:
-
-```text
-Desarrollo Temprano
-```
-
-La arquitectura y los módulos continúan evolucionando activamente.
-
----
-
-# Roadmap
-
-## v0.1
-
-* Motor básico de captura
-* Preprocesamiento OpenCV
-* OCR simple
-* Sistema de eventos
-* Arquitectura ligera
-
----
-
-## v0.2
-
-* Detección de enemigos
-* Parsing HUD
-* Optimización ROI
-* Mejor preprocess OCR
-
----
-
-## v0.3
-
-* Aceleración ONNX
-* OCR multilenguaje
-* Análisis de movimiento
-* Memoria temporal
-
----
-
-## v0.4
-
-* Integración VTuber IA
-* Comentarios en tiempo real
-* Sistema emocional
-* Automatización de streams
-
----
-
-# Filosofía del Diseño
-
-Karin Vision Lite no pretende ser una IA multimodal universal.
-
-En cambio, se enfoca en:
-
-* visión artificial especializada
-* ejecución ligera
-* arquitectura modular
-* interacción en tiempo real
-
----
-
-# Contribución
-
-Las contribuciones, sugerencias y pruebas son bienvenidas.
-
-Planes futuros:
-
-* mejoras OCR
-* soporte multilenguaje
-* perfiles específicos por juego
-* pipelines optimizados
-* mejores sistemas de eventos
-
----
-
-# Licencia
-
-Este proyecto sigue actualmente la licencia del repositorio.
-
----
-
-# Advertencia
-
-Karin Vision Lite está diseñado para investigación, desarrollo y entretenimiento.
-
-Los usuarios son responsables de cumplir:
-
-* políticas de videojuegos
-* políticas de plataformas
-* reglas de streaming
-* leyes y regulaciones locales
-
----
-
-# Visión a Futuro
-
-El objetivo a largo plazo de Karin Vision Lite es convertirse en un motor de percepción ligero capaz de impulsar:
-
-* VTubers IA
-* streamers IA
-* asistentes inteligentes
-* herramientas de accesibilidad
-* sistemas de comprensión gameplay en tiempo real
+MIT License
 
 ---
 
 <div align="center">
 
-Karin Vision Lite
-
-Motor de Visión Ligero para Gaming
+Hecho con ❤️ para Gamers, VTubers y Creadores de IA
 
 </div>
-
