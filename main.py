@@ -17,6 +17,7 @@ from vision.motion import MotionDetector
 from vision.template import SceneAnalyzer
 from vision.ocr import GameOCREngine
 from vision.tracking import UIDetector, LifeBarDetector, VisionEngine
+from vision.cache import VisualCache
 
 
 class KarinVisionLite:
@@ -34,6 +35,8 @@ class KarinVisionLite:
         self.lifebars = LifeBarDetector()
         self.engine = VisionEngine()
 
+        self._cache = VisualCache()
+        self._last_debug = None
         self._frame_count = 0
 
     def set_logger(self, log_fn):
@@ -59,6 +62,10 @@ class KarinVisionLite:
                     time.sleep(0.5)
                     continue
 
+                if not self._cache.check(frame):
+                    time.sleep(0.3)
+                    continue
+
                 now = time.time()
                 if now - last_ocr < interval:
                     time.sleep(0.3)
@@ -79,6 +86,7 @@ class KarinVisionLite:
         fps_counter = 0
         fps_time = time.time()
         full_scan_counter = 0
+        _detect_w, _detect_h = 640, 360
 
         while self._running:
             try:
@@ -94,44 +102,59 @@ class KarinVisionLite:
                     fps_counter = 0
                     fps_time = time.time()
 
-                debug = frame.copy()
+                if self._cache.check(frame):
+                    h_full, w_full = frame.shape[:2]
+                    sx = w_full / _detect_w
+                    sy = h_full / _detect_h
 
-                # Lightweight: motion + scene (every frame)
-                motion, score, regions = self.motion.detect(frame)
-                for r in regions:
-                    x, y, bw, bh = r["box"]
-                    cv2.rectangle(debug, (x, y), (x + bw, y + bh), (0, 255, 255), 2)
+                    small = cv2.resize(frame, (_detect_w, _detect_h))
+                    debug = frame.copy()
 
-                # Scene labels (runs on 64x48, cheap)
-                scene_labels = self.scene.analyze(frame)
-                if scene_labels:
-                    cv2.putText(debug, scene_labels[0].replace("escenario_", ""),
-                                (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                    motion, score, regions = self.motion.detect(small)
+                    for r in regions:
+                        x, y, bw, bh = r["box"]
+                        cv2.rectangle(debug, (int(x * sx), int(y * sy)),
+                                      (int((x + bw) * sx), int((y + bh) * sy)), (0, 255, 255), 2)
 
-                # Transition detection (cheap)
-                trans, _ = self.motion.detect_transition(frame)
-                if trans:
-                    full_scan_counter = 0
+                    step = self._frame_count % 3
+                    if step == 0:
+                        scene_labels = self.scene.analyze(small)
+                        if scene_labels:
+                            cv2.putText(debug, scene_labels[0].replace("escenario_", ""),
+                                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-                # Life bars (mid-weight)
-                if self._frame_count % 3 == 0:
-                    life_dets = self.lifebars.detect(frame)
-                    for lb in life_dets:
-                        x, y, bw, bh = lb["box"]
-                        cv2.rectangle(debug, (x, y), (x + bw, y + bh), (0, 255, 0), 1)
+                    trans, _ = self.motion.detect_transition(small)
+                    if trans:
+                        full_scan_counter = 0
 
-                # Full scan every ~30 frames or on transition
-                full_scan_counter += 1
-                if full_scan_counter > 30 or trans:
-                    full_scan_counter = 0
-                    flow = self.motion.detect_optical_flow(frame)
-                    if flow.get("direction"):
-                        cv2.putText(debug, flow["direction"],
-                                    (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
-                    ui_dets = self.ui.detect(frame)
-                    for u in ui_dets:
-                        x, y, bw, bh = u["box"]
-                        cv2.rectangle(debug, (x, y), (x + bw, y + bh), (255, 0, 255), 1)
+                    if step == 1:
+                        life_dets = self.lifebars.detect(small)
+                        for lb in life_dets:
+                            x, y, bw, bh = lb["box"]
+                            cv2.rectangle(debug, (int(x * sx), int(y * sy)),
+                                          (int((x + bw) * sx), int((y + bh) * sy)), (0, 255, 0), 1)
+
+                    full_scan_counter += 1
+                    if full_scan_counter > 30 or trans:
+                        full_scan_counter = 0
+                        flow = self.motion.detect_optical_flow(small)
+                        if flow.get("direction"):
+                            cv2.putText(debug, flow["direction"],
+                                        (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+                        ui_dets = self.ui.detect(small)
+                        for u in ui_dets:
+                            x, y, bw, bh = u["box"]
+                            cv2.rectangle(debug, (int(x * sx), int(y * sy)),
+                                          (int((x + bw) * sx), int((y + bh) * sy)), (255, 0, 255), 1)
+
+                    self._last_debug = debug
+                else:
+                    if self._last_debug is not None:
+                        debug = self._last_debug
+                        cv2.putText(debug, "CACHED", (10, 20),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 100, 100), 1)
+                    else:
+                        debug = frame.copy()
 
                 cv2.imshow("Karin Vision Lite", debug)
 
@@ -161,6 +184,9 @@ class KarinVisionLite:
                     continue
 
                 last_scan = now
+
+                if not self._cache.check(frame):
+                    continue
 
                 motion, _, _ = self.motion.detect(frame)
                 scene = self.scene.analyze(frame)
