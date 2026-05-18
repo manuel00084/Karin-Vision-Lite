@@ -4,43 +4,81 @@ from .template import ColorDetector, SceneAnalyzer
 from .motion import MotionDetector as MotionTrackerDetector
 
 
-class ORBTracker:
-    def __init__(self, n_features=500):
-        self._orb = cv2.ORB_create(nfeatures=n_features)
+class LucasKanadeTracker:
+    def __init__(self, max_points=200, quality=0.01, min_dist=10):
+        self._max_points = max_points
+        self._quality = quality
+        self._min_dist = min_dist
+        self._lk_params = dict(winSize=(21, 21), maxLevel=2,
+                               criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+        self._prev_gray = None
+        self._points = None
+        self._bbox = None
+        self._active = False
 
-    def detect(self, frame):
+    def init(self, frame, bbox=None):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        return self._orb.detectAndCompute(gray, None)
+        self._prev_gray = gray
+        if bbox:
+            x, y, w, h = bbox
+            mask = np.zeros_like(gray)
+            mask[y:y + h, x:x + w] = 255
+            self._points = cv2.goodFeaturesToTrack(gray, self._max_points,
+                                                   self._quality, self._min_dist, mask=mask)
+            self._bbox = list(bbox)
+        else:
+            self._points = cv2.goodFeaturesToTrack(gray, self._max_points,
+                                                   self._quality, self._min_dist)
+            if self._points is not None:
+                xs = [int(p[0][0]) for p in self._points]
+                ys = [int(p[0][1]) for p in self._points]
+                self._bbox = [min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)]
+        self._active = self._points is not None and len(self._points) > 4
+        return self._active
 
-    @staticmethod
-    def draw_keypoints(frame, keypoints):
-        return cv2.drawKeypoints(frame, keypoints, None,
-                                 flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-    def match_templates(self, frame, templates):
+    def update(self, frame):
+        if not self._active:
+            return False, self._bbox
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        h, w = frame.shape[:2]
-        kp_frame, des_frame = self._orb.detectAndCompute(gray, None)
-        results = []
-        if des_frame is None or len(kp_frame) < 4:
-            return results
-        for tpl in templates:
-            if "descriptors" not in tpl:
-                continue
-            bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-            matches = bf.match(tpl["descriptors"], des_frame)
-            if len(matches) > 6:
-                pts = [kp_frame[m.trainIdx].pt for m in matches]
-                xs = [int(p[0]) for p in pts]
-                ys = [int(p[1]) for p in pts]
-                x_min, x_max = max(0, min(xs)), min(w, max(xs))
-                y_min, y_max = max(0, min(ys)), min(h, max(ys))
-                bw, bh = x_max - x_min, y_max - y_min
-                if bw > 10 and bh > 10:
-                    results.append({"class_name": f"personaje_{tpl['name']}",
-                                    "confidence": min(0.9, len(matches) / 30.0),
-                                    "box": [x_min, y_min, bw, bh]})
-        return results
+        if self._prev_gray is None:
+            self._prev_gray = gray
+            self._active = False
+            return False, self._bbox
+        pts, st, _ = cv2.calcOpticalFlowPyrLK(self._prev_gray, gray,
+                                               self._points, None, **self._lk_params)
+        self._prev_gray = gray
+        if pts is None:
+            self._active = False
+            return False, self._bbox
+        good = pts[st.flatten() == 1]
+        if len(good) < 4:
+            self._active = False
+            return False, self._bbox
+        self._points = good.reshape(-1, 1, 2)
+        xs = [int(p[0]) for p in self._points[:, 0]]
+        ys = [int(p[1]) for p in self._points[:, 0]]
+        self._bbox = [min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)]
+        return True, self._bbox
+
+    def draw(self, frame, color=(0, 255, 0)):
+        if self._active and self._bbox:
+            x, y, w, h = self._bbox
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        if self._points is not None:
+            for p in self._points:
+                cx, cy = p[0]
+                cv2.circle(frame, (int(cx), int(cy)), 2, color, -1)
+        return frame
+
+    def reset(self):
+        self._prev_gray = None
+        self._points = None
+        self._bbox = None
+        self._active = False
+
+    @property
+    def active(self):
+        return self._active
 
 
 class UIDetector:

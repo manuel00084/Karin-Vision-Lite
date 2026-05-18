@@ -170,3 +170,72 @@ class SceneAnalyzer:
             labels.append("escenario_exterior")
 
         return labels
+
+
+class ShapeDetector:
+    def __init__(self, min_area=200):
+        self._min_area = min_area
+
+    def detect(self, frame):
+        h, w = frame.shape[:2]
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        half = cv2.resize(gray, (w // 2, h // 2))
+        hh, hw = half.shape
+        results = []
+
+        edges = cv2.Canny(half, 40, 120)
+        edges = cv2.dilate(edges, None, iterations=1)
+        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area < self._min_area // 4 or area > hw * hh * 0.3:
+                continue
+
+            perim = cv2.arcLength(cnt, True)
+            if perim == 0:
+                continue
+
+            circularity = 4 * np.pi * area / (perim * perim)
+            hull = cv2.convexHull(cnt)
+            hull_area = cv2.contourArea(hull)
+            convexity = area / hull_area if hull_area > 0 else 1
+
+            x, y, bw, bh = cv2.boundingRect(cnt)
+            aspect = bw / max(bh, 1)
+            approx = cv2.approxPolyDP(cnt, 0.04 * perim, True)
+            vertices = len(approx)
+
+            if circularity > 0.85 and convexity > 0.9:
+                label = "circular"
+                conf = min(0.7, circularity)
+            elif convexity < 0.7:
+                label = "irregular"
+                conf = 0.4
+            elif vertices == 3:
+                label = "triangular"
+                conf = 0.6
+            elif vertices == 4:
+                if 0.9 < aspect < 1.1:
+                    label = "cuadrado"
+                    conf = 0.65
+                else:
+                    label = "rectangular"
+                    conf = 0.6
+            elif vertices >= 6 and circularity < 0.7:
+                label = "estrella"
+                conf = 0.5
+            else:
+                label = "poligono"
+                conf = 0.45
+
+            if aspect > 4:
+                label = "alargado"
+                conf = 0.55
+
+            results.append({"class_name": f"forma_{label}", "confidence": conf,
+                            "box": [x * 2, y * 2, bw * 2, bh * 2],
+                            "shape": {"vertices": vertices, "circularidad": round(circularity, 3),
+                                      "aspecto": round(aspect, 2), "convexidad": round(convexity, 3)}})
+
+        return results
